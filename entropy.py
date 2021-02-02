@@ -82,11 +82,11 @@ def difference(Nfit_temp,Nfit_mu,temp_min,temp_max, densA,densB, doublA, doubleB
 	print (temp_h)
 	for i in range(1,Nfit_temp-1):
 		for j in range(Nfit_mu):
-			dfdtA[i,j]=(densA[i+1,j]-densB[i-1,j])/(2*temp_h)
+			dfdtA[i,j]=(densA[i+1,j]-densA[i-1,j])/(2*temp_h)
 			dfdtB[i,j]=(densB[i+1,j]-densB[i-1,j])/(2*temp_h)
 
 	for j in range(Nfit_mu):
-        	dfdtA[0,j]=(densA[1,j]-densB[0,j])/temp_h
+        	dfdtA[0,j]=(densA[1,j]-densA[0,j])/temp_h
         	dfdtA[-1,j]=(densA[-1,j]-densA[-2,j])/temp_h
         	dfdtB[0,j]=(densB[1,j]-densB[0,j])/temp_h
         	dfdtB[-1,j]=(densB[-1,j]-densB[-2,j])/temp_h
@@ -101,7 +101,7 @@ def difference(Nfit_temp,Nfit_mu,temp_min,temp_max, densA,densB, doublA, doubleB
 #------------------------------------------------------------------------------------------------------------------------------------
 def ent(temp_index,mu_min,mu_max,Nfit_mu,Nfit_temp,densA,densB,dfdtA,dfdtB):
 
-	mu_h=(mu_min-(-mu_max))/Nfit_mu;
+	mu_h=(-mu_min-(-mu_max))/Nfit_mu;
 	print (mu_h)
 	print ('This is temperature')
 	i=temp_index
@@ -113,29 +113,31 @@ def ent(temp_index,mu_min,mu_max,Nfit_mu,Nfit_temp,densA,densB,dfdtA,dfdtB):
                 	llim=j
                 	break
 
-	print (llim,zzAnew[i,llim])
+	print (llim,densA[i,llim])
 
 	sumA=np.zeros(Nfit_mu)
 	sumB=np.zeros(Nfit_mu)
 
+	sumdtotA=np.zeros(Nfit_mu)
+	sumdtotB=np.zeros(Nfit_mu)
 
 	s=open("Entropy.dat",'w')
 	for mu in range(llim+2,Nfit_mu):
-        	sumdA=(densA[i,llim]+densA[i,mu])*0.5 #density sum
-        	sumdB=(densB[i,llim]+densB[i,mu])*0.5
-        	sA=(dfdtA[i,llim]+dfdtA[i,mu])*0.5      #Entropy
-        	sB=(dfdtB[i,llim]+dfdtB[i,mu])*0.5
-	for j in range(llim+1,mu-1):
-		sA=sA+dfdtA[i,j]
-		sB=sB+dfdtB[i,j]
-		sumdA=sumdA+densA[i,j]
-		sumdB=sumdB+densB[i,j]
-	sumA[mu]=hmu*sA
-	sumB[mu]=hmu*sB
-	sumdtotA=hmu*sumdA
-	sumdtotB=hmu*sumdB
+		sumdA=(densA[i,llim]+densA[i,mu])*0.5 #density sum
+		sumdB=(densB[i,llim]+densB[i,mu])*0.5
+		sA=(dfdtA[i,llim]+dfdtA[i,mu])*0.5      #Entropy
+		sB=(dfdtB[i,llim]+dfdtB[i,mu])*0.5
+		for j in range(llim+1,mu-1):
+			sA=sA+dfdtA[i,j]
+			sB=sB+dfdtB[i,j]
+			sumdA=sumdA+densA[i,j]
+			sumdB=sumdB+densB[i,j]
+		sumA[mu]=mu_h*sA
+		sumB[mu]=mu_h*sB
+		sumdtotA[mu]=mu_h*sumdA
+		sumdtotB[mu]=mu_h*sumdB
 
-	print (sumtotA, sumtotB)
+	print (sumA, sumB)
 
 	#for j in range(Nfit_mu):
         #	s.write("%6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n"  %(zzAnew[i,j],zzBnew[i,j],dAnew[i,j],dBnew[i,j],sumA[j]+2.0*sumB[j]))
